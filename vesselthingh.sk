@@ -1,0 +1,342 @@
+on load:
+	set {Inferno} to stick named "&6ɪɴғᴇʀɴᴏ &7ᴠᴇssᴇʟ" with custom model data 5
+	set {Bubble} to stick named "&9ʙᴜʙʙʟᴇ &7ᴠᴇssᴇʟ" with custom model data 10
+	set {essence} to stick named "&lVessel Essence"
+	set {Inferno1} to "<##FF5300>&lF<##FF5A07>&ll<##FE600D>&la<##FE6714>&lm<##FD6E1B>&le <##FD7B28>&lA<##FC822F>&lr<##FC8835>&lr<##FB8F3C>&lo<##FB9643>&lw <##FAA350>&l:"
+	set {Inferno2} to "<##FF5300>&lF<##FF5A07>&ll<##FE620F>&la<##FE6916>&lm<##FD701D>&le <##FC7F2C>&lK<##FC8633>&li<##FB8D3A>&lc<##FB9441>&lk <##FAA350>&l:"
+	set {Inferno3} to "<##FD33EF>&l(<##FD33EF>&lU<##FD33EF>&ll<##FD33EF>&lt<##FD33EF>&li<##FD33EF>&lm<##FD33EF>&la<##FD33EF>&lt<##FD33EF>&le<##FD33EF>&l) <##FF5300>&lF<##FE5C09>&ll<##FE6512>&la<##FD6E1B>&lm<##FD7724>&le <##FC8835>&lA<##FB913E>&lu<##FB9A47>&lr<##FAA350>&la <##FAA350>&l:"
+	set {Bubble1} to "<##3359FD>&lB<##3A61FC>&lu<##4168FA>&lb<##4870F9>&lb<##4E77F8>&ll<##557FF6>&le <##638EF4>&lR<##6A96F2>&lo<##719DF1>&lo<##77A5F0>&lm <##85B4ED>&l:"
+	set {Bubble2} to "<##3359FD>&lS<##3A61FC>&lw<##4168FA>&lo<##4870F9>&lr<##4E77F8>&ld <##5C87F5>&lC<##638EF4>&ll<##6A96F2>&la<##719DF1>&ls<##77A5F0>&lh <##85B4ED>&l:"
+	set {Bubble3} to "<##FD33EF>&l(<##FD33EF>&lU<##FD33EF>&ll<##FD33EF>&lt<##FD33EF>&li<##FD33EF>&lm<##FD33EF>&la<##FD33EF>&lt<##FD33EF>&le<##FD33EF>&l) <##3359FD>&lE<##385FFC>&ll<##3E65FB>&le<##436BFA>&lc<##4971F9>&lt<##4E77F8>&lr<##547DF7>&lo <##5F8AF4>&lS<##6490F3>&lt<##6A96F2>&lr<##6F9CF1>&li<##75A2F0>&lk<##7AA8EF>&le <##85B4ED>&l:"
+
+
+every second:
+	loop all players:
+		if {cooldown1::%loop-player%} is more than 0:
+			remove 1 from {cooldown1::%loop-player%}
+		if {cooldown1::%loop-player%} is 0:
+			set {cooldown1::%loop-player%} to "Ready"
+		if {cooldown2::%loop-player%} is more than 0:
+			remove 1 from {cooldown2::%loop-player%}
+		if {cooldown2::%loop-player%} is 0:
+			set {cooldown2::%loop-player%} to "Ready"
+		if {cooldown3::%loop-player%} is more than 0:
+			remove 1 from {cooldown3::%loop-player%}
+		if {cooldown3::%loop-player%} is 0:
+			set {cooldown3::%loop-player%} to "Ready"
+			
+on join:
+	setbar(player)
+	if {koinse34::*} does not contain player:
+		add player to {koinse34::*}
+		set {damage::%player's uuid%} to 0
+		set {selector::%player's uuid%} to 1
+		set {cooldown1::%player%} to "Ready"
+		set {cooldown2::%player%} to "Ready"
+		set {cooldown3::%player%} to "Charge Ultimate"
+		set {EssenceLevel::%player%} to 0
+	if {vessel} is true:
+		if {koinse34::*} does not contain player:
+			add player to {koinse3::*}
+			roll(player)
+			
+
+on right click:
+	if player is holding {essence}:
+		if {EssenceLevel::%player%} is greater than or equal to 0:
+			add 1 to {EssenceLevel::%player%}
+			stop
+		if {EssenceLevel::%player%} is more than or equal to 2:	
+			stop
+
+
+on swap hand items:
+	loop "Inferno", "Bubble":
+		if player's held item is {%loop-value%}:
+			if {selector::%player's uuid%} is less than 3:
+				add 1 to {selector::%player's uuid%}
+			else:
+				set {selector::%player's uuid%} to 1
+			cancel event
+			
+on drop:
+	loop "Inferno", "Bubble":
+		if item is {%loop-value%}:
+			cancel event
+
+on inventory open:
+	if event-inventory is not player's inventory:
+		set {nope::%player's uuid%} to true
+on inventory close:
+	set {nope::%player's uuid%} to false
+on inventory click:
+	if {nope::%player's uuid%} is true:
+		cancel event
+on right click:
+	if player's target block is decorated pot:
+		loop "Inferno", "Bubble":
+			if player's held item is {%loop-value%}:
+				cancel event
+	if player's target entity is item frame:
+		loop "Inferno", "Bubble":
+			if player's held item is {%loop-value%}:
+				cancel event
+			
+function roll(P: player):
+	set {vessel::%{_P}%} to random element out of "Inferno", "Bubble"
+	give {_P} {%{vessel::%{_P}%}%}
+
+command /vessal [<text>] [<player>]:
+	permission: op
+	trigger:
+		if arg-1 is "all":
+			give player {Inferno}
+			give player {Bubble}
+		if arg-1 is "start":
+			Broadcast "&fThe Vessel SMP has begun!!!"
+			set {vessel} to true
+			loop all players:
+				add loop-player to {koinse34::*}
+				roll(loop-player)
+		if arg-1 is "reroll":
+			roll(arg-2)
+every tick:
+	loop all players:
+		if {vessel::%loop-player%} is set:
+			if {cooldown1::%loop-player%} is not "Ready":
+				set {_cool1} to "%{cooldown1::%loop-player%}% seconds" parsed as a timespan
+			else:
+				set {_cool1} to {cooldown1::%loop-player%}
+			if {cooldown2::%loop-player%} is not "Ready":
+				set {_cool2} to "%{cooldown2::%loop-player%}% seconds" parsed as a timespan
+			else:
+				set {_cool2} to {cooldown2::%loop-player%}
+				set {_cool3} to {cooldown3::%loop-player%}
+			if {selector::%loop-player's uuid%} is 1:
+				send action bar "%{%{vessel::%loop-player%}%1}% &a%{_cool1}%" to loop-player
+			if {selector::%loop-player's uuid%} is 2:
+				send action bar "%{%{vessel::%loop-player%}%2}% &a%{_cool2}%" to loop-player
+			if {selector::%loop-player's uuid%} is 3:
+				send action bar "%{%{vessel::%loop-player%}%3}% &a%{_cool3}%" to loop-player
+
+function setbar(P: player):
+	set {_damage} to {damage::%{_P}'s uuid%} / 125
+	set {_prog} to {_damage} * 100
+	set {_bar} to boss bar with id "le-bar%{_P}%" with title "<##DE64FF>&lU<##E16CFF>&ll<##E473FF>&lt<##E77BFF>&li<##EA83FF>&lm<##ED8AFF>&la<##F092FF>&lt<##F399FF>&le" with color pink with progress {_prog}
+	add {_P} to {_bar}
+	send "%{_damage} * 100%" to {_P}
+function changebar(P: player):
+	set {_damage} to {damage::%{_P}'s uuid%} / 125
+	set {_prog} to {_damage} * 100
+	set bar progress of boss bar with id "le-bar%{_P}%" to {_prog}
+
+on damage:
+	add damage to {damage::%attacker's uuid%}
+	changebar(attacker)
+	if {damage::%attacker's uuid%} is more than or equal to 125:
+		set {cooldown3::%attacker%} to "Ready"
+		
+
+on right click:
+	loop "Inferno", "Bubble":
+		if player's held item is {%loop-value%}:
+			triggerab(player, "%loop-value%", {selector::%player's uuid%})
+function triggerab(P: player, A: text, N: number):
+	if {_A} is "Inferno":
+		if {_N} is 1:
+			if {cooldown1::%{_P}%} is "Ready":
+				if {EssenceLevel::%player%} is 0:
+					set {cooldown1::%{_P}%} to 30
+					set {_extra} to 0.01
+					set {_amount} to 1
+					set {_num} to 0
+					loop 50 times:
+						set {_loc} to location above {_P} 
+						add 1 to {_num}
+						make {_amount} of flame 2 block infront of {_loc} with extra {_extra}
+						if {_num} is 2:
+							add 2 to {_amount}
+							set {_num} to 0
+						wait 1 tick
+					set {_loc} to location 2 blocks infront of {_loc}
+					loop 100 times:
+						draw 10 of flame at {_loc} with extra 0.1
+						set {_loc} to location 0.5 blocks infront of {_loc}
+						loop all blocks in radius 0.5 around {_loc}:
+							if loop-block is not air:
+								draw 100 of flame at {_loc} with extra 10
+								create explosion of force 3 at {_loc}
+								stop
+						loop all entities in radius 0.5 around {_loc}:
+							if loop-entity is not {_P}:
+								draw 100 of flame at {_loc} with extra 10
+								create explosion of force 3 at {_loc}
+								stop
+		if {_N} is 2:
+			if {cooldown2::%{_P}%} is "Ready":
+				if {EssenceLevel::%player%} is 1:
+					set {cooldown2::%{_P}%} to 40
+					push {_P} up at speed 3
+					set {fall::%{_P}%} to true
+					loop 20 times:
+						draw 5 of dust_color_transition using dustTransition(yellow, blue, 2) at location of {_P} with offset vector(random number from -1 to 1, random number from -1 to 1, random number from -1 to 1)
+						wait 1 tick
+					push {_P} down at speed 3
+					while block below {_P} is air:
+						loop 5 times:
+							draw 10 of dust_color_transition using dustTransition(yellow, blue, 2) at location of {_P} with offset vector(random number from -1 to 1, random number from -1 to 1, random number from -1 to 1)
+						wait 1 tick
+					loop entities in radius 5 around {_P}:
+						if loop-entity is not {_P}:
+							damage loop-entity by 5 hearts
+					loop blocks in radius 3 around {_P}:
+						if loop-block is not air:
+							if loop-block's hardness is less than 8:
+								break loop-block
+					if {EssenceLevel::%player%} is less than 1:
+						stop
+								
+		if {_N} is 3:
+			if {cooldown3::%{_P}%} is "Ready":
+				if {damage::%{_P}'s uuid%} is more than or equal to 125:
+					if {EssenceLevel::%player%} is 2:
+						set {cooldown3::%{_P}%} to "Charge Ultimate"
+						set {damage::%{_P}'s uuid%} to 0
+						changebar({_P})
+						set {_yaw} to 0
+						loop 140 times:
+							set {_loc} to location 0.8 blocks below {_P}
+							set {_loc}'s yaw to {_yaw}
+							set {_loc}'s pitch to 0
+							drawparticle("fire", 1, 1, {_loc})
+							add 5 to {_yaw}
+							loop entities in radius 15 around {_P}:
+								if loop-entity is not {_P}:
+									light loop-entity on fire for 5 seconds
+							wait 1 tick
+					if {EssenceLevel::%player%} is less than 2:
+						stop
+	if {_A} is "Bubble":
+		if {_N} is 1:
+			if {cooldown1::%{_P}%} is "Ready":
+				set {cooldown1::%{_P}%} to 50
+				loop blocks in radius 6 around {_P}:
+					if distance between {_P} and loop-block is more than 5:
+						if loop-block is air or snow or torch or water or lava:
+							set loop-block to blue stained glass
+							add location at loop-block to {blocklocation::*}
+							waitblock(location at loop-block)
+				loop entities in radius 5 around {_P}:
+					if loop-entity is not {_P}:
+						apply weakness 2 to loop-entity for 10 seconds
+				apply strength 2 to {_P} for 10 seconds
+	if {_A} is "Bubble":
+		if {_N} is 2:
+			if {cooldown2::%{_P}%} is "Ready":
+				if {EssenceLevel::%player%} is 1:
+					set {cooldown2::%{_P}%} to 60
+					loop blocks in radius 6 around {_P}:
+						if distance between {_P} and loop-block is more than 5:
+							if loop-block is air or snow or torch or water or lava:
+								set loop-block to blue stained glass
+								add location at loop-block to {blocklocation::*}
+								waitblock(location at loop-block)
+					loop entities in radius 5 around {_P}:
+						if loop-entity is not {_P}:
+							apply weakness 10000000 to loop-entity for 10 seconds
+							apply slowness 10000000 to loop-entity for 10 seconds
+					set {lighting::%{_P}%} to 0
+					loop 200 times:
+						if {_P}'s held item is a sword:
+							loop 5 times:
+							draw 10 of dust_color_transition using dustTransition(yellow, blue, 2) at location of {_P} with offset vector(random number from -1 to 1, random number from -1 to 1, random number from -1 to 1)
+					wait 1 tick
+					delete {lighting::%{_P}%}
+					if {EssenceLevel::%player%} is less than 1:
+					stop
+		if {_N} is 3:
+			if {cooldown3::%{_P}%} is "Ready":
+				if {EssenceLevel::%player%} is 2:
+					set {cooldown3::%{_P}%} to "Charge Ultimate"
+					set {damage::%{_P}'s uuid%} to 0
+					changebar({_P})
+					push {_P} up at speed 3
+					wait 1.5 seconds
+					set {_Loc} to location at {_P}
+					set {fall::%{_P}%} to true
+					set {_time} to 0
+					while block below {_loc} is air:
+						set {_Loc} to location 0.5 blocks below {_Loc}
+						add 1 to {_time}
+						loop 5 times:
+							draw 10 of dust_color_transition using dustTransition(yellow, blue, 2) at location of {_loc} with offset vector(random number from -1 to 1, random number from -1 to 1, random number from -1 to 1)
+						if {_time} is 3:
+							set {_time} to 0
+							wait 1 tick
+					create explosion of force 4 at {_loc}
+					draw 1000 of dragon breath at {_loc} with extra 10
+					
+on damage:
+	if {lighting::%attacker%} is set:
+		if attacker's held item is a sword:
+			add 1 to {lighting::%attacker%}
+			if {lighting::%attacker%} is 3:
+				strike lightning at victim
+				set {lighting::%attacker%} to 0
+on block break:
+	if {blocklocation::*} contains location at block:
+		cancel event
+on explode:
+	loop blocks in radius 13 around event-location:
+		if {blocklocation::*} contains location at loop-block:
+			set loop-block to blue stained glass
+
+
+function waitblock(L: location):
+	wait 10 seconds
+	remove {_L} from {blocklocation::*}
+	set block at {_L} to air
+
+
+on damage:
+	if damage cause is fall:
+		if {fall::%victim%} is true:
+			cancel event
+			set {fall::%victim%} to false
+
+function drawparticle(N: text, S: number, L: number, W: location):
+	set {_list::*} to {%{_N}%} split at "/"
+	loop {_L} times:
+		loop {_list::*}:
+			set {_loc} to {_W}
+			set {_list2::*} to loop-value-2 split at ","
+			set {_1} to "%{_list2::4}%" parsed as a number
+			set {_2} to "%{_list2::5}%" parsed as a number
+			set {_3} to "%{_list2::6}%" parsed as a number
+			set {_4} to "%{_list2::7}%" parsed as a number
+			set {_5} to "%{_list2::8}%" parsed as a number
+			set {_6} to "%{_list2::9}%" parsed as a number
+			set {_1} to {_1}*1
+			set {_2} to {_2}*1
+			set {_3} to {_3}*1
+			set {_4} to {_4}*1
+			set {_loc} to location {_1} meters right of {_loc}
+			set {_loc} to location {_2} meters left of {_loc}
+			set {_loc} to location {_3} meters above {_loc}
+			set {_loc} to location {_4} meters below {_loc}
+			set {_loc} to location {_5} meters infront of {_loc}
+			set {_loc} to location {_6} meters behind {_loc}
+			set {_1} to "%{_list2::1}%" parsed as a number
+			set {_2} to "%{_list2::2}%" parsed as a number
+			set {_3} to "%{_list2::3}%" parsed as a number
+			draw 1 of dust using dustOption(rgb({_1}, {_2}, {_3}), {_S}) at {_loc}
+		wait 1 tick
+
+on load:
+	set {fire} to "254,103,0,-0.28,0.28,1,0,0.84,-0.84/255,108,2,-0.20,0.2,1,0,0.84,-0.84/255,111,2,-0.12,0.12,1,0,0.84,-0.84/239,118,5,-0.04,0.04,1,0,0.84,-0.84/255,212,170,0.04,-0.04,1,0,0.84,-0.84/240,193,124,0.12,-0.12,1,0,0.84,-0.84/250,135,8,0.20,-0.2,1,0,0.84,-0.84/251,137,5,0.28,-0.28,1,0,0.84,-0.84/250,123,10,-0.44,0.44,1,0,0.76,-0.76/255,125,4,-0.36,0.36,1,0,0.76,-0.76/255,146,3,-0.28,0.28,1,0,0.76,-0.76/252,141,0,-0.20,0.2,1,0,0.76,-0.76/253,135,0,-0.12,0.12,1,0,0.76,-0.76/250,132,0,-0.04,0.04,1,0,0.76,-0.76/253,128,0,0.04,-0.04,1,0,0.76,-0.76/254,117,1,0.12,-0.12,1,0,0.76,-0.76/253,111,1,0.20,-0.2,1,0,0.76,-0.76/253,108,1,0.28,-0.28,1,0,0.76,-0.76/244,217,136,0.44,-0.44,1,0,0.76,-0.76/250,190,103,-0.60,0.6,1,0,0.68,-0.68/255,144,0,-0.52,0.52,1,0,0.68,-0.68/255,187,6,-0.44,0.44,1,0,0.68,-0.68/255,180,5,-0.36,0.36,1,0,0.68,-0.68/251,235,0,-0.28,0.28,1,0,0.68,-0.68/254,214,2,-0.20,0.2,1,0,0.68,-0.68/255,240,7,-0.12,0.12,1,0,0.68,-0.68/254,238,3,-0.04,0.04,1,0,0.68,-0.68/252,210,1,0.04,-0.04,1,0,0.68,-0.68/255,176,5,0.12,-0.12,1,0,0.68,-0.68/255,127,2,0.20,-0.2,1,0,0.68,-0.68/254,109,2,0.28,-0.28,1,0,0.68,-0.68/236,151,99,0.36,-0.36,1,0,0.68,-0.68/255,130,4,0.44,-0.44,1,0,0.68,-0.68/255,240,148,0.60,-0.6,1,0,0.68,-0.68/248,201,128,-0.68,0.68,1,0,0.6,-0.60/255,170,1,-0.60,0.6,1,0,0.6,-0.60/250,228,0,-0.52,0.52,1,0,0.6,-0.60/255,252,6,-0.44,0.44,1,0,0.6,-0.60/255,254,6,-0.36,0.36,1,0,0.6,-0.60/254,255,1,-0.28,0.28,1,0,0.6,-0.60/255,252,6,-0.20,0.2,1,0,0.6,-0.60/247,250,35,-0.12,0.12,1,0,0.6,-0.60/254,254,8,-0.04,0.04,1,0,0.6,-0.60/255,255,1,0.04,-0.04,1,0,0.6,-0.60/255,255,1,0.12,-0.12,1,0,0.6,-0.60/255,224,8,0.20,-0.2,1,0,0.6,-0.60/255,145,3,0.28,-0.28,1,0,0.6,-0.60/255,115,0,0.36,-0.36,1,0,0.6,-0.60/249,103,4,0.44,-0.44,1,0,0.6,-0.60/255,255,191,0.52,-0.52,1,0,0.6,-0.60/254,194,0,-0.68,0.68,1,0,0.52,-0.52/253,255,0,-0.60,0.6,1,0,0.52,-0.52/255,255,0,-0.52,0.52,1,0,0.52,-0.52/254,255,0,-0.44,0.44,1,0,0.52,-0.52/235,243,62,-0.36,0.36,1,0,0.52,-0.52/252,226,122,-0.12,0.12,1,0,0.52,-0.52/250,250,28,0.12,-0.12,1,0,0.52,-0.52/255,254,3,0.20,-0.2,1,0,0.52,-0.52/250,216,0,0.28,-0.28,1,0,0.52,-0.52/254,165,3,0.36,-0.36,1,0,0.52,-0.52/250,111,10,0.44,-0.44,1,0,0.52,-0.52/253,121,10,0.52,-0.52,1,0,0.52,-0.52/254,219,5,-0.76,0.76,1,0,0.44,-0.44/255,251,5,-0.68,0.68,1,0,0.44,-0.44/255,255,1,-0.60,0.6,1,0,0.44,-0.44/247,249,54,-0.52,0.52,1,0,0.44,-0.44/240,240,195,-0.44,0.44,1,0,0.44,-0.44/250,177,23,-0.36,0.36,1,0,0.44,-0.44/252,140,2,-0.28,0.28,1,0,0.44,-0.44/240,106,9,-0.20,0.2,1,0,0.44,-0.44/255,111,2,-0.04,0.04,1,0,0.44,-0.44/254,126,3,0.04,-0.04,1,0,0.44,-0.44/255,255,255,0.12,-0.12,1,0,0.44,-0.44/254,253,15,0.28,-0.28,1,0,0.44,-0.44/252,230,0,0.36,-0.36,1,0,0.44,-0.44/255,139,4,0.44,-0.44,1,0,0.44,-0.44/254,105,11,0.52,-0.52,1,0,0.44,-0.44/255,127,2,0.60,-0.6,1,0,0.44,-0.44/255,251,1,-0.76,0.76,1,0,0.36,-0.36/254,255,4,-0.68,0.68,1,0,0.36,-0.36/254,254,6,-0.60,0.6,1,0,0.36,-0.36/253,143,4,-0.44,0.44,1,0,0.36,-0.36/246,116,4,-0.36,0.36,1,0,0.36,-0.36/254,114,3,-0.28,0.28,1,0,0.36,-0.36/255,134,1,-0.20,0.2,1,0,0.36,-0.36/244,146,0,-0.12,0.12,1,0,0.36,-0.36/255,145,3,-0.04,0.04,1,0,0.36,-0.36/252,122,0,0.04,-0.04,1,0,0.36,-0.36/236,96,17,0.12,-0.12,1,0,0.36,-0.36/240,138,30,0.20,-0.2,1,0,0.36,-0.36/255,255,181,0.28,-0.28,1,0,0.36,-0.36/254,253,3,0.36,-0.36,1,0,0.36,-0.36/255,185,0,0.44,-0.44,1,0,0.36,-0.36/254,114,1,0.52,-0.52,1,0,0.36,-0.36/248,106,4,0.60,-0.6,1,0,0.36,-0.36/240,183,114,0.68,-0.68,1,0,0.36,-0.36/255,255,0,-0.84,0.84,1,0,0.28,-0.28/255,255,0,-0.76,0.76,1,0,0.28,-0.28/244,249,71,-0.68,0.68,1,0,0.28,-0.28/250,104,1,-0.44,0.44,1,0,0.28,-0.28/248,122,1,-0.36,0.36,1,0,0.28,-0.28/255,203,5,-0.28,0.28,1,0,0.28,-0.28/254,254,6,-0.20,0.2,1,0,0.28,-0.28/255,252,65,-0.12,0.12,1,0,0.28,-0.28/255,253,87,-0.04,0.04,1,0,0.28,-0.28/255,254,1,0.04,-0.04,1,0,0.28,-0.28/253,178,1,0.12,-0.12,1,0,0.28,-0.28/248,103,10,0.20,-0.2,1,0,0.28,-0.28/255,250,18,0.36,-0.36,1,0,0.28,-0.28/254,238,3,0.44,-0.44,1,0,0.28,-0.28/255,137,6,0.52,-0.52,1,0,0.28,-0.28/232,155,76,0.60,-0.6,1,0,0.28,-0.28/255,255,0,-0.84,0.84,1,0,0.2,-0.20/240,246,24,-0.76,0.76,1,0,0.2,-0.20/237,245,142,-0.68,0.68,1,0,0.2,-0.20/255,255,255,-0.60,0.6,1,0,0.2,-0.20/247,112,5,-0.52,0.52,1,0,0.2,-0.20/255,127,0,-0.44,0.44,1,0,0.2,-0.20/242,201,0,-0.36,0.36,1,0,0.2,-0.20/248,255,12,-0.28,0.28,1,0,0.2,-0.20/248,228,146,-0.20,0.2,1,0,0.2,-0.20/224,129,37,-0.12,0.12,1,0,0.2,-0.20/235,104,16,-0.04,0.04,1,0,0.2,-0.20/227,128,27,0.04,-0.04,1,0,0.2,-0.20/245,243,83,0.12,-0.12,1,0,0.2,-0.20/253,173,0,0.20,-0.2,1,0,0.2,-0.20/244,113,5,0.28,-0.28,1,0,0.2,-0.20/249,255,0,0.44,-0.44,1,0,0.2,-0.20/255,140,3,0.52,-0.52,1,0,0.2,-0.20/252,103,1,0.60,-0.6,1,0,0.2,-0.20/229,174,111,0.68,-0.68,1,0,0.2,-0.20/252,255,21,0.84,-0.84,1,0,0.2,-0.20/255,255,0,-0.84,0.84,1,0,0.12,-0.12/244,249,94,-0.76,0.76,1,0,0.12,-0.12/253,125,0,-0.60,0.6,1,0,0.12,-0.12/255,112,5,-0.52,0.52,1,0,0.12,-0.12/250,175,0,-0.44,0.44,1,0,0.12,-0.12/255,253,4,-0.36,0.36,1,0,0.12,-0.12/255,255,182,-0.28,0.28,1,0,0.12,-0.12/249,112,6,-0.20,0.2,1,0,0.12,-0.12/246,253,35,-0.12,0.12,1,0,0.12,-0.12/226,121,55,0.12,-0.12,1,0,0.12,-0.12/255,254,4,0.20,-0.2,1,0,0.12,-0.12/248,116,5,0.28,-0.28,1,0,0.12,-0.12/243,234,162,0.36,-0.36,1,0,0.12,-0.12/254,255,0,0.44,-0.44,1,0,0.12,-0.12/254,157,1,0.52,-0.52,1,0,0.12,-0.12/248,118,8,0.60,-0.6,1,0,0.12,-0.12/255,148,9,0.68,-0.68,1,0,0.12,-0.12/245,236,136,0.76,-0.76,1,0,0.12,-0.12/255,254,1,0.84,-0.84,1,0,0.12,-0.12/251,248,33,-0.84,0.84,1,0,0.04,-0.04/245,247,50,-0.76,0.76,1,0,0.04,-0.04/252,192,108,-0.68,0.68,1,0,0.04,-0.04/253,116,0,-0.60,0.6,1,0,0.04,-0.04/255,132,4,-0.52,0.52,1,0,0.04,-0.04/254,240,9,-0.44,0.44,1,0,0.04,-0.04/241,108,17,-0.28,0.28,1,0,0.04,-0.04/255,243,11,-0.20,0.2,1,0,0.04,-0.04/255,255,19,0.20,-0.2,1,0,0.04,-0.04/254,112,4,0.28,-0.28,1,0,0.04,-0.04/255,254,0,0.44,-0.44,1,0,0.04,-0.04/253,140,2,0.52,-0.52,1,0,0.04,-0.04/216,147,89,0.60,-0.6,1,0,0.04,-0.04/255,245,173,0.68,-0.68,1,0,0.04,-0.04/254,255,3,0.84,-0.84,1,0,0.04,-0.04/248,179,93,-0.68,0.68,1,0,-0.04,0.04/252,110,2,-0.60,0.6,1,0,-0.04,0.04/255,150,5,-0.52,0.52,1,0,-0.04,0.04/254,255,1,-0.44,0.44,1,0,-0.04,0.04/232,255,232,-0.36,0.36,1,0,-0.04,0.04/229,105,19,-0.28,0.28,1,0,-0.04,0.04/245,255,11,-0.20,0.2,1,0,-0.04,0.04/255,255,255,-0.12,0.12,1,0,-0.04,0.04/252,249,14,0.20,-0.2,1,0,-0.04,0.04/238,143,56,0.28,-0.28,1,0,-0.04,0.04/236,243,85,0.36,-0.36,1,0,-0.04,0.04/251,250,0,0.44,-0.44,1,0,-0.04,0.04/255,123,2,0.52,-0.52,1,0,-0.04,0.04/222,150,92,0.60,-0.6,1,0,-0.04,0.04/255,253,1,0.84,-0.84,1,0,-0.04,0.04/255,255,255,-0.84,0.84,1,0,-0.12,0.12/255,100,0,-0.60,0.6,1,0,-0.12,0.12/251,140,0,-0.52,0.52,1,0,-0.12,0.12/255,255,0,-0.44,0.44,1,0,-0.12,0.12/249,103,4,-0.28,0.28,1,0,-0.12,0.12/255,254,6,-0.20,0.2,1,0,-0.12,0.12/238,246,73,0.12,-0.12,1,0,-0.12,0.12/254,119,2,0.20,-0.2,1,0,-0.12,0.12/247,250,9,0.36,-0.36,1,0,-0.12,0.12/255,198,12,0.44,-0.44,1,0,-0.12,0.12/255,108,4,0.52,-0.52,1,0,-0.12,0.12/244,250,54,0.76,-0.76,1,0,-0.12,0.12/253,255,1,0.84,-0.84,1,0,-0.12,0.12/251,255,10,-0.84,0.84,1,0,-0.2,0.20/245,196,118,-0.68,0.68,1,0,-0.2,0.20/255,166,86,-0.60,0.6,1,0,-0.2,0.20/254,150,1,-0.52,0.52,1,0,-0.2,0.20/253,254,3,-0.44,0.44,1,0,-0.2,0.20/238,249,139,-0.36,0.36,1,0,-0.2,0.20/254,172,8,-0.20,0.2,1,0,-0.2,0.20/249,255,115,-0.12,0.12,1,0,-0.2,0.20/244,114,2,0.04,-0.04,1,0,-0.2,0.20/213,126,72,0.12,-0.12,1,0,-0.2,0.20/255,252,76,0.28,-0.28,1,0,-0.2,0.20/255,231,6,0.36,-0.36,1,0,-0.2,0.20/255,120,4,0.44,-0.44,1,0,-0.2,0.20/255,238,204,0.52,-0.52,1,0,-0.2,0.20/244,187,74,0.60,-0.6,1,0,-0.2,0.20/246,246,194,0.68,-0.68,1,0,-0.2,0.20/255,254,0,0.76,-0.76,1,0,-0.2,0.20/244,252,27,0.84,-0.84,1,0,-0.2,0.20/255,253,2,-0.84,0.84,1,0,-0.28,0.28/224,135,33,-0.68,0.68,1,0,-0.28,0.28/255,102,0,-0.60,0.6,1,0,-0.28,0.28/255,126,2,-0.52,0.52,1,0,-0.28,0.28/249,225,3,-0.44,0.44,1,0,-0.28,0.28/255,255,255,-0.36,0.36,1,0,-0.28,0.28/239,154,37,-0.28,0.28,1,0,-0.28,0.28/247,109,8,-0.20,0.2,1,0,-0.28,0.28/252,193,5,-0.12,0.12,1,0,-0.28,0.28/250,255,0,-0.04,0.04,1,0,-0.28,0.28/254,249,27,0.04,-0.04,1,0,-0.28,0.28/250,255,6,0.12,-0.12,1,0,-0.28,0.28/255,255,4,0.20,-0.2,1,0,-0.28,0.28/244,184,0,0.28,-0.28,1,0,-0.28,0.28/253,128,0,0.36,-0.36,1,0,-0.28,0.28/237,121,22,0.44,-0.44,1,0,-0.28,0.28/254,144,3,0.52,-0.52,1,0,-0.28,0.28/249,250,68,0.68,-0.68,1,0,-0.28,0.28/255,255,1,0.76,-0.76,1,0,-0.28,0.28/245,134,16,-0.60,0.6,1,0,-0.36,0.36/252,117,2,-0.52,0.52,1,0,-0.36,0.36/246,175,0,-0.44,0.44,1,0,-0.36,0.36/255,255,0,-0.36,0.36,1,0,-0.36,0.36/255,255,204,-0.28,0.28,1,0,-0.36,0.36/255,117,18,-0.12,0.12,1,0,-0.36,0.36/255,128,1,-0.04,0.04,1,0,-0.36,0.36/255,150,6,0.04,-0.04,1,0,-0.36,0.36/253,146,4,0.12,-0.12,1,0,-0.36,0.36/255,127,5,0.20,-0.2,1,0,-0.36,0.36/255,100,0,0.28,-0.28,1,0,-0.36,0.36/212,118,56,0.36,-0.36,1,0,-0.36,0.36/255,255,255,0.60,-0.6,1,0,-0.36,0.36/255,254,4,0.68,-0.68,1,0,-0.36,0.36/255,252,0,0.76,-0.76,1,0,-0.36,0.36/255,255,155,-0.76,0.76,1,0,-0.44,0.44/255,161,78,-0.52,0.52,1,0,-0.44,0.44/250,134,0,-0.44,0.44,1,0,-0.44,0.44/246,213,0,-0.36,0.36,1,0,-0.44,0.44/248,255,8,-0.28,0.28,1,0,-0.44,0.44/247,245,72,-0.20,0.2,1,0,-0.44,0.44/255,111,6,0.12,-0.12,1,0,-0.44,0.44/249,209,133,0.20,-0.2,1,0,-0.44,0.44/255,255,196,0.44,-0.44,1,0,-0.44,0.44/247,251,145,0.52,-0.52,1,0,-0.44,0.44/254,255,0,0.60,-0.6,1,0,-0.44,0.44/255,255,0,0.68,-0.68,1,0,-0.44,0.44/246,151,21,-0.60,0.6,1,0,-0.52,0.52/209,100,18,-0.52,0.52,1,0,-0.52,0.52/255,116,1,-0.44,0.44,1,0,-0.52,0.52/255,145,6,-0.36,0.36,1,0,-0.52,0.52/255,233,2,-0.28,0.28,1,0,-0.52,0.52/253,254,0,-0.20,0.2,1,0,-0.52,0.52/255,255,135,-0.12,0.12,1,0,-0.52,0.52/255,252,113,-0.04,0.04,1,0,-0.52,0.52/255,249,191,0.20,-0.2,1,0,-0.52,0.52/255,255,84,0.44,-0.44,1,0,-0.52,0.52/255,255,1,0.52,-0.52,1,0,-0.52,0.52/253,232,1,0.60,-0.6,1,0,-0.52,0.52/252,233,7,0.68,-0.68,1,0,-0.52,0.52/247,255,147,-0.68,0.68,1,0,-0.6,0.60/255,240,157,-0.60,0.6,1,0,-0.6,0.60/236,126,13,-0.52,0.52,1,0,-0.6,0.60/255,113,0,-0.36,0.36,1,0,-0.6,0.60/255,159,6,-0.28,0.28,1,0,-0.6,0.60/253,192,3,-0.20,0.2,1,0,-0.6,0.60/254,250,1,-0.12,0.12,1,0,-0.6,0.60/255,255,1,-0.04,0.04,1,0,-0.6,0.60/255,254,3,0.04,-0.04,1,0,-0.6,0.60/255,254,3,0.12,-0.12,1,0,-0.6,0.60/254,253,25,0.20,-0.2,1,0,-0.6,0.60/253,255,0,0.28,-0.28,1,0,-0.6,0.60/255,255,1,0.36,-0.36,1,0,-0.6,0.60/252,254,3,0.44,-0.44,1,0,-0.6,0.60/253,197,0,0.52,-0.52,1,0,-0.6,0.60/251,198,4,0.60,-0.6,1,0,-0.6,0.60/255,161,0,-0.52,0.52,1,0,-0.68,0.68/255,107,4,-0.36,0.36,1,0,-0.68,0.68/255,113,1,-0.28,0.28,1,0,-0.68,0.68/254,133,0,-0.20,0.2,1,0,-0.68,0.68/255,155,3,-0.12,0.12,1,0,-0.68,0.68/253,180,0,-0.04,0.04,1,0,-0.68,0.68/255,204,3,0.04,-0.04,1,0,-0.68,0.68/255,230,3,0.12,-0.12,1,0,-0.68,0.68/253,253,0,0.20,-0.2,1,0,-0.68,0.68/255,202,0,0.28,-0.28,1,0,-0.68,0.68/253,217,1,0.36,-0.36,1,0,-0.68,0.68/255,167,1,0.44,-0.44,1,0,-0.68,0.68/251,167,17,0.52,-0.52,1,0,-0.68,0.68/254,132,9,-0.36,0.36,1,0,-0.76,0.76/253,104,1,-0.20,0.2,1,0,-0.76,0.76/255,110,3,-0.12,0.12,1,0,-0.76,0.76/255,123,2,-0.04,0.04,1,0,-0.76,0.76/255,136,0,0.04,-0.04,1,0,-0.76,0.76/254,150,3,0.12,-0.12,1,0,-0.76,0.76/255,148,3,0.20,-0.2,1,0,-0.76,0.76/255,134,1,0.28,-0.28,1,0,-0.76,0.76/255,137,1,0.36,-0.36,1,0,-0.76,0.76/245,105,8,-0.20,0.2,1,0,-0.84,0.84/254,103,0,-0.12,0.12,1,0,-0.84,0.84/253,104,1,-0.04,0.04,1,0,-0.84,0.84/255,102,2,0.04,-0.04,1,0,-0.84,0.84/254,102,1,0.12,-0.12,1,0,-0.84,0.84/233,102,14,0.20,-0.2,1,0,-0.84,0.84"
+
+	
+					
+				
+	
+
